@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TrustLens+ v2</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;700&display=swap');
+        body {
+            margin: 0; padding: 20px; font-family: 'Inter', sans-serif;
+            background: #0f172a; color: #f8fafc;
+            /* Aurora background */
+            background-image: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 50%),
+                              radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.1), transparent 50%);
+            background-attachment: fixed;
+        }
+        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; }
+        
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(30, 27, 75, 0.4);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+            margin-bottom: 24px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover { border-color: rgba(168, 85, 247, 0.6); }
+
+        .header-title { font-size: 2.5rem; font-weight: 800; margin:0; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .flex-row { display: flex; gap: 24px; flex-wrap: wrap; }
+        .col { flex: 1; min-width: 300px; }
+        .col-2 { flex: 2; min-width: 500px; }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .product-card {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px; padding: 16px; text-align: center; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .product-card:hover { transform: translateY(-5px); border-color: #a855f7; box-shadow: 0 10px 25px rgba(168, 85, 247, 0.2); }
+        .prod-img { width: 100%; height: 160px; object-fit: contain; border-radius: 8px; background: #fff; margin-bottom: 12px; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; margin-top: 10px;}
+        .status-risky { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.5); }
+        .status-caution { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.5); }
+        .status-trusted { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.5); }
+
+        #deep-dive-panel { display: none; margin-top: 40px; border-top: 2px dashed rgba(139, 92, 246, 0.3); padding-top: 40px; }
+        .metric-value { font-size: 2rem; font-weight: 800; font-family: 'Outfit'; }
+        
+        /* Alerts */
+        .alert-red { background: rgba(239,68,68,0.1); border-left: 4px solid #ef4444; padding: 16px; border-radius: 8px; color: #fca5a5; margin-bottom: 20px; }
+        .llm-audit { background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 8px; padding: 16px; font-family: monospace; color: #cbd5e1; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div class="header-title">💎 TrustLens+ v2</div>
+        <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px 16px; border-radius: 20px; font-weight: bold;">
+            SYSTEM ACTIVE
+        </div>
+    </div>
+
+    <!-- FEATURE 6: Market Manipulation Dashboard -->
+    <div class="glass-card">
+        <h3 style="margin-top:0;">Feature 6: Market Manipulation Dashboard</h3>
+        <div class="flex-row">
+            <div style="flex:1; display:flex; flex-direction:column; gap:20px;">
+                <div style="text-align:center; padding: 20px; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                    <div style="color:#94a3b8; text-transform:uppercase; font-size:0.85rem; letter-spacing:1px;">Total Simulated Illicit Revenue</div>
+                    <div class="metric-value" style="color:#ef4444;">₹ 3,405,200</div>
+                </div>
+                <div style="text-align:center; padding: 20px; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                    <div style="color:#94a3b8; text-transform:uppercase; font-size:0.85rem; letter-spacing:1px;">Market Manipulated</div>
+                    <div class="metric-value" style="color:#f59e0b;">42.8%</div>
+                </div>
+            </div>
+            <div class="col-2" style="background:rgba(0,0,0,0.2); border-radius:12px; padding:10px;">
+                <h4 style="margin:0 0 0 20px; color:#c084fc; font-size:0.9rem;">Ranked Financial Harm by Product</h4>
+                <div id="chart-market-harm" style="height: 180px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <h2 style="margin-top: 40px; color: #e2e8f0;">Active Monitor: Top Entities</h2>
+    <div class="product-grid" id="productGrid">
+        <!-- Rendered via JS -->
+    </div>
+
+    <!-- DEEP DIVE PANEL -->
+    <div id="deep-dive-panel">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <h1 class="header-title" id="dd-title" style="margin:0; font-size:2.5rem;">Product Name</h1>
+            <button onclick="closeDeepDive()" style="background:#334155; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">Close Analysis ✖</button>
+        </div>
+        <p id="dd-id" style="color:#64748b; font-family:monospace; margin-top:5px; margin-bottom:20px;">ID: B0XXXXXXX</p>
+
+        <div class="alert-red" id="dd-alert" style="display:none;">
+            🚨 <strong>MANIPULATION DETECTED:</strong> Significant coordinated botnet behavior identified.
+        </div>
+
+        <div class="flex-row">
+            <!-- Feature 5: Counterfactual True Price Engine -->
+            <div class="col glass-card">
+                <h3 style="margin-top:0; color:#cbd5e1;">Feature 5: Counterfactual True Price Engine</h3>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <span style="color:#94a3b8;">Manipulated Market Price</span>
+                    <strong style="color:#e2e8f0; font-size:1.2rem;" id="dd-price-man">₹ 0</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <span style="color:#94a3b8;">Estimated Fair Price (True Value)</span>
+                    <strong style="color:#10b981; font-size:1.2rem;" id="dd-price-fair">₹ 0</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:15px; margin-top:20px; background:rgba(239,68,68,0.05); border-radius:8px; border:1px solid rgba(239,68,68,0.2);">
+                    <span style="color:#fca5a5; font-weight:600;">Consumer Overpay (Due to Fake Rating)</span>
+                    <strong style="color:#ef4444; font-size:1.3rem;" id="dd-overpay">₹ 0</strong>
+                </div>
+            </div>
+
+            <!-- Feature 4: Sentiment-Star Mismatch Gauge -->
+            <div class="col glass-card">
+                <h3 style="margin-top:0; color:#cbd5e1;">Feature 4: Sentiment-Star Mismatch Gauge</h3>
+                <div id="chart-gauge" style="height: 200px;"></div>
+            </div>
+        </div>
+
+        <div class="flex-row">
+            <!-- Feature 1: Reviewer DNA Fingerprint -->
+            <div class="col-2 glass-card">
+                <h3 style="margin-top:0; color:#cbd5e1;">Feature 1: Reviewer DNA Fingerprint</h3>
+                <p style="color:#94a3b8; font-size:0.85rem; margin-top:-10px;">TF-IDF stylistic clustering to detect automated text generation farms.</p>
+                <div id="chart-dna" style="height: 380px;"></div>
+            </div>
+
+            <!-- Feature 3: LLM Forensic Audit Trail -->
+            <div class="col glass-card">
+                <h3 style="margin-top:0; color:#cbd5e1;">Feature 3: LLM Forensic Audit Trail</h3>
+                <p style="color:#94a3b8; font-size:0.85rem; margin-top:-10px;">Human-readable explainability output mapping flags to insights.</p>
+                <div id="dd-llm" class="llm-audit" style="height: 350px; overflow-y:auto; font-size:14px; line-height:1.6;">
+                    > Initializing LLM Audit...
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2: Cross-Product Collusion Map -->
+        <div class="glass-card">
+            <h3 style="margin-top:0; color:#cbd5e1;">Feature 2: Cross-Product Collusion Map</h3>
+            <p style="color:#94a3b8; font-size:0.9rem; margin-top:-10px;">Drawing a network graph isolating bot accounts that operate across multiple product listings.</p>
+            <div id="chart-network" style="height: 500px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 9 Products dataset (6 Risky, 3 Caution)
+        const products = [
+            {id: "B0CRWBRSBD", name: "Apple MacBook Air M1", price: 74990, distortion: 0.8, status: "Risky", img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop"},
+            {id: "B0CG7PXYH4", name: "GoPro HERO12 Black", price: 34990, distortion: 0.6, status: "Risky", img: "https://images.unsplash.com/photo-1502920514313-52581002a659?q=80&w=800&auto=format&fit=crop"},
+            {id: "B08N5WRWNW", name: "ASUS ROG Zephyrus G14", price: 189990, distortion: 1.2, status: "Risky", img: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=800&auto=format&fit=crop"},
+            {id: "B0C785X1GV", name: "Apple AirPods Pro", price: 24900, distortion: 0.5, status: "Risky", img: "https://images.unsplash.com/photo-1606220588913-b3eea415a2ed?q=80&w=800&auto=format&fit=crop"},
+            {id: "B0BLP1RMBH", name: "Samsung Galaxy S24 Ultra", price: 129999, distortion: 0.4, status: "Risky", img: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=800&auto=format&fit=crop"},
+            {id: "B0CHWR8EGG", name: "DJI Mini 4 Pro Drone", price: 82990, distortion: 0.7, status: "Risky", img: "https://images.unsplash.com/photo-1524143878510-cebfb421a1f0?q=80&w=800&auto=format&fit=crop"},
+            {id: "B0CD7ZRL8N", name: "Sony WH-1000XM5", price: 29990, distortion: 0.2, status: "Caution", img: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?q=80&w=800&auto=format&fit=crop"},
+            {id: "B0CJ3P4RXT", name: "Nintendo Switch OLED", price: 34990, distortion: 0.25, status: "Caution", img: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?q=80&w=800&auto=format&fit=crop"},
+            {id: "B0CD7J4614", name: "Kindle Paperwhite", price: 13999, distortion: 0.15, status: "Caution", img: "https://images.unsplash.com/photo-1544228428-c94ca33324fc?q=80&w=800&auto=format&fit=crop"},
+        ];
+
+        // Format Currency
+        const fmtINR = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
+
+        // Render Grid
+        const grid = document.getElementById('productGrid');
+        products.forEach(p => {
+            const sc = p.status === 'Risky' ? 'status-risky' : 'status-caution';
+            const imgHtml = p.img ? `<img src="${p.img}" class="prod-img" onerror="this.src='https://dummyimage.com/300x160/1e1b4b/a855f7&text=No+Image';">` : `<div class="prod-img" style="display:flex;align-items:center;justify-content:center;background:#1e1b4b;color:#a855f7;font-size:2rem;font-weight:bold;">${p.name.substring(0,1)}</div>`;
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                ${imgHtml}
+                <div style="font-weight:700; font-size:1.1rem; color:#e2e8f0; height:55px; overflow:hidden;">${p.name}</div>
+                <div style="color:#c084fc; font-weight:800; font-size:1.5rem; margin:15px 0;">${fmtINR(p.price)}</div>
+                <div class="status-badge ${sc}">${p.status} (${p.distortion > 0.5 ? 'High' : 'Med'} Manipulation)</div>
+            `;
+            card.onclick = () => openDeepDive(p);
+            grid.appendChild(card);
+        });
+
+        // Feature 6: Market Harm Bar Chart
+        const harmData = [{
+            x: products.map(p => p.price * p.distortion * 25).sort((a,b)=>b-a),
+            y: products.map(p => p.name).reverse(),
+            type: 'bar', orientation: 'h',
+            marker: { color: 'rgba(239, 68, 68, 0.8)' }
+        }];
+        Plotly.newPlot('chart-market-harm', harmData, {
+            margin: {l: 180, r: 20, t: 10, b: 20},
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#e2e8f0' },
+            xaxis: {showgrid: false, zeroline: false},
+            yaxis: {showgrid: false, zeroline: false}
+        }, {displayModeBar: false});
+
+        let typeWriterInterval = null;
+
+        function closeDeepDive() {
+            document.getElementById('deep-dive-panel').style.display = 'none';
+            if (typeWriterInterval) clearInterval(typeWriterInterval);
+        }
+
+        function openDeepDive(p) {
+            document.getElementById('deep-dive-panel').style.display = 'block';
+            document.getElementById('dd-title').innerText = p.name;
+            document.getElementById('dd-id').innerText = `ASIN: ${p.id}`;
+            document.getElementById('dd-alert').style.display = p.status === 'Risky' ? 'block' : 'none';
+
+            // Feature 5: Counterfactual Price Engine
+            const overpay = p.price * (p.distortion / 5);
+            const fairValue = p.price - overpay;
+            document.getElementById('dd-price-man').innerText = fmtINR(p.price);
+            document.getElementById('dd-price-fair').innerText = fmtINR(fairValue);
+            document.getElementById('dd-overpay').innerText = `+ ` + fmtINR(overpay);
+
+            // Feature 4: Sentiment vs Star Mismatch
+            const starScore = p.status === 'Risky' ? 4.9 : 4.4;
+            const sentScore = starScore - p.distortion*3; // Creates mismatch delta > 0.3 for risky
+            const isRedAlert = (starScore - sentScore) > 0.3;
+            
+            const gaugeData = [{
+                type: "indicator", mode: "gauge+number+delta",
+                value: sentScore, title: { text: "Calculated NLP Sentiment Score vs Explicit Star Rating", font: {size: 11, color: '#94a3b8'} },
+                delta: { reference: starScore, position: "top", decreasing: {color: "#ef4444"} },
+                gauge: { 
+                    axis: { range: [0, 5], tickcolor: '#fff' }, 
+                    bar: { color: isRedAlert ? "#ef4444" : "#10b981" }, 
+                    bgcolor: "rgba(255,255,255,0.05)", borderwidth: 0,
+                    threshold: { line: {color: "white", width: 4}, thickness: 0.75, value: starScore }
+                }
+            }];
+            Plotly.newPlot('chart-gauge', gaugeData, { paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', margin: {t:40, b:20, l:20, r:20} });
+
+            // Feature 1: DNA Fingerprint Scatter (TF-IDF Simulation)
+            const n_points = 150;
+            const x_real = Array.from({length: n_points}, () => Math.random() * 5);
+            const y_real = Array.from({length: n_points}, () => Math.random() * 5);
+            const x_bot = Array.from({length: 60}, () => Math.random() * 0.4 + 3.8); // tightly clustered synthetic writing style
+            const y_bot = Array.from({length: 60}, () => Math.random() * 0.4 + 3.8);
+            
+            const dnaData = [
+                {x: x_real, y: y_real, mode: 'markers', name: 'Organic Reviews', marker: {color: '#10b981', size: 6, opacity: 0.5}},
+                {x: x_bot, y: y_bot, mode: 'markers', name: 'Bot Cluster (TF-IDF Isomorphic)', marker: {color: '#ef4444', size: 8, symbol: 'x'}}
+            ];
+            Plotly.newPlot('chart-dna', dnaData, {
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+                font: {color: '#94a3b8'}, margin: {t:20, b:40, l:40, r:20},
+                xaxis: {title: 'Lexical Density (Syntax Repetition)', showgrid: false}, yaxis: {title: 'Semantic Alignment (VADER Deviation)', showgrid: false},
+                legend: {x: 0, y: 1}
+            });
+
+            // Feature 2: Cross-Product Collusion Network Graph
+            const t_arr = Array.from({length: 40}, () => Math.random() * 2 * Math.PI);
+            const r_arr = Array.from({length: 40}, () => Math.random());
+            const edgeX = [], edgeY = [];
+            
+            for(let i=0; i<30; i++) {
+                edgeX.push(0, r_arr[i]*Math.cos(t_arr[i]), null);
+                edgeY.push(0, r_arr[i]*Math.sin(t_arr[i]), null);
+            }
+            
+            const netData = [
+                {x: edgeX, y: edgeY, mode: 'lines', line: {color: 'rgba(168,85,247,0.3)', width: 1}, hoverinfo: 'none'},
+                {x: r_arr.map((r,i)=>r*Math.cos(t_arr[i])), y: r_arr.map((r,i)=>r*Math.sin(t_arr[i])), mode: 'markers', marker: {size: 12, color: '#06b6d4'}, name: 'Intercepted Reviewer Account'},
+                {x: [0], y: [0], mode: 'markers+text', text: [p.name.split(' ')[0]], marker: {size: 35, color: '#ef4444'}, name: 'Focus Product'},
+                {x: [0.6, -0.5, 0.4], y: [0.6, 0.7, -0.6], mode: 'markers+text', text: ['Headphones', 'Tablet', 'Camera'], marker: {size: 25, color: '#f59e0b'}, name: 'Cross-Collusion Products'}
+            ];
+            Plotly.newPlot('chart-network', netData, {
+                paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+                font: {color: '#94a3b8'}, margin: {t:10, b:10, l:10, r:10},
+                xaxis: {visible: false}, yaxis: {visible: false}, showlegend: true, legend: {x: 0.8, y: 1}
+            });
+
+            // Feature 3: LLM Audit Trail
+            const llmTarget = document.getElementById('dd-llm');
+            llmTarget.innerHTML = `<span style="color:#a855f7;">> Initiating secure connection to OpenAI GPT-4.0 Forensics Trace...</span><br><br>`;
+            
+            let auditText = "";
+            let speed = 10;
+            if(p.status === 'Risky') {
+                auditText = `[CRITICAL ALERT] Analyzing Reviewer DNA Fingerprint Matrix for ${p.name}...\n> Discovered 60 accounts displaying perfectly isomorphic syntactic structures via TF-IDF analysis.\n\n[SENTIMENT MISMATCH]\n> The VADER polarity computation indicates a score of ${sentScore.toFixed(2)}, heavily contradicting the explicitly selected rating of ${starScore.toFixed(2)}⭐ (Delta: ${(starScore-sentScore).toFixed(2)}).\n\n[ECONOMETRIC FRAUD WARNING]\n> This manipulated rating artificially inflates conversion rates. Utilizing price elasticity dynamics on a ₹${fmtINR(p.price).replace('₹','').trim()} product, this orchestrates a calculated consumer overpay of ₹${fmtINR(overpay).replace('₹','').trim()}.\n\n[RECOMMENDATION]: Immediate regulatory action. Botnet accounts flagged for suppression.`;
+            } else {
+                auditText = `[CAUTION ALERT] Analyzing Reviewer DNA Fingerprint Matrix for ${p.name}...\n> Syntactic clustering remains relatively organic, representing standard Gaussian variance.\n\n[SENTIMENT CHECK]\n> VADER polarity correlation to manual star rating validates with a minimal delta of ${(starScore-sentScore).toFixed(2)}.\n\n[RECOMMENDATION]: Continue passive monitoring. No highly coordinated malicious burst activity confirmed at this time.`;
+                speed = 20;
+            }
+            
+            let charIndex = 0;
+            if (typeWriterInterval) clearInterval(typeWriterInterval);
+            
+            function typeWriter() {
+                if (charIndex < auditText.length) {
+                    llmTarget.innerHTML += auditText.charAt(charIndex);
+                    charIndex++;
+                    llmTarget.scrollTop = llmTarget.scrollHeight;
+                } else {
+                    clearInterval(typeWriterInterval);
+                }
+            }
+            setTimeout(() => { typeWriterInterval = setInterval(typeWriter, speed); }, 500);
+
+            // Smooth scroll
+            document.getElementById('deep-dive-panel').scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>

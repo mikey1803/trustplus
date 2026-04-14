@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustLens Store | Premium Electronics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="h-container">
+            <div class="logo">TrustLens</div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search electronics...">
+            </div>
+            <div class="h-actions">
+                <button id="compare-btn" class="btn btn-outline" disabled>Compare <span id="compare-count">(0)</span></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="filters">
+            <h1>Premium Electronics</h1>
+            <p>Showing <span id="product-count">0</span> authentic products curated for you.</p>
+        </div>
+        
+        <div class="product-grid" id="product-grid">
+            <!-- Products injected by script.js -->
+        </div>
+    </main>
+
+    <!-- Side Panel (Insights) -->
+    <div id="side-panel" class="side-panel">
+        <div class="panel-header">
+            <h2>Product Insights</h2>
+            <button id="close-panel" class="btn-icon">&times;</button>
+        </div>
+        <div class="panel-content" id="panel-content">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+    
+    <!-- Dark overlay for panels and modals -->
+    <div id="panel-overlay" class="overlay"></div>
+
+    <!-- Compare Modal -->
+    <div id="compare-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Compare Products</h2>
+                <button id="close-modal" class="btn-icon">&times;</button>
+            </div>
+            <div class="modal-body" id="compare-body">
+                <!-- Comparison cards injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
